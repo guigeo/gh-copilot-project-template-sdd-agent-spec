@@ -20,11 +20,14 @@ echo ""
 
 mkdir -p "$TARGET_DIR"
 
-# Copia estrutura .github
+# Copia estrutura .github (prompts, chatmodes, instructions, context)
 cp -r "$TEMPLATE_DIR/.github" "$TARGET_DIR/.github"
 
-# Copia estrutura docs/sdd
+# Copia estrutura docs (sdd + dev)
 cp -r "$TEMPLATE_DIR/docs" "$TARGET_DIR/docs"
+
+# new-project é exclusivo do template (template-only) — não deve viver no filho
+rm -f "$TARGET_DIR/.github/prompts/new-project.prompt.md"
 
 # Cria .gitignore básico
 cat > "$TARGET_DIR/.gitignore" << 'EOF'

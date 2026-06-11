@@ -1,106 +1,138 @@
 # Copilot AgentSpec Template
 
-> Template de projeto com o workflow AgentSpec SDD (Spec-Driven Development) adaptado para GitHub Copilot + VS Code.
+> Template de projeto com o workflow **AgentSpec 4.2 (Spec-Driven Development)** adaptado para
+> **GitHub Copilot + VS Code**. Crie um projeto, rode `#new-project` e comece a codar com KBs,
+> chat modes e instruções selecionados pelo seu stack.
 
 ---
 
 ## O que está incluído
 
-```
+```text
 .github/
-├── copilot-instructions.md     # Contexto global do projeto (auto-carregado pelo Copilot)
-├── prompts/                    # Workflow SDD — um prompt por fase
-│   ├── 00-project-init.prompt.md
-│   ├── 01-brainstorm.prompt.md
-│   ├── 02-define.prompt.md
-│   ├── 03-design.prompt.md
-│   ├── 04-build.prompt.md
-│   ├── 05-ship.prompt.md
-│   └── review.prompt.md
-├── instructions/               # Instruções por contexto (aplicadas automaticamente)
-│   ├── python.instructions.md  → aplicado em *.py
-│   ├── tests.instructions.md   → aplicado em test_*.py
-│   └── domain.instructions.md  → aplicado em src/**
+├── copilot-instructions.md     # Contexto global (auto-carregado pelo Copilot)
+├── prompts/                    # Workflow SDD + utilitários (um prompt por arquivo)
+│   ├── 00-project-init · 01-brainstorm · 02-define · 03-design · 04-build · 05-ship
+│   ├── iterate                 # atualização cross-phase
+│   ├── new-project · contribute        # ciclo de vida template ⇄ filho
+│   ├── sync-context · create-kb · memory · readme-maker · create-pr · review · dev
+├── chatmodes/                  # Personas: spec-driven · code-reviewer · kb-architect
+├── instructions/               # Padrões por tipo de arquivo (applyTo): python · tests · sql · domain
 └── context/                    # Knowledge Base (referenciada com #file:)
-    └── _templates/
+    ├── pyspark · delta-lake · databricks-lakeflow
+    ├── arquitetura-medalhao · qualidade-de-dados · data-mesh
+    └── _templates/             # Templates para criar novas KBs
 docs/
-└── sdd/                        # Artefatos SDD (BRAINSTORM, DEFINE, DESIGN, BUILD, SHIP)
-    ├── features/               # Features em andamento
-    ├── archive/                # Features entregues
-    └── templates/              # Templates de documentos
-setup.sh                        # Cria novo projeto a partir deste template
+├── sdd/                        # Artefatos SDD
+│   ├── features/ · archive/    # Em andamento / entregues
+│   ├── templates/              # 5 templates de documento
+│   ├── examples/               # Exemplo completo (GCP pipeline)
+│   └── architecture/           # WORKFLOW_CONTRACTS.yaml + ARCHITECTURE.md
+└── dev/                        # Dev Loop (PROMPT/PROGRESS templates)
+catalog.yaml                    # Catálogo de componentes (usado por #new-project)
+setup.sh                        # Fallback de criação (copia tudo)
 ```
 
 ---
 
 ## Requisitos
 
-- VS Code
-- Extensão [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat)
+- VS Code + extensão [GitHub Copilot Chat](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat)
 - Conta com acesso ao GitHub Copilot (Individual, Business ou Enterprise)
 
 ---
 
 ## Criar um novo projeto
 
+### Opção A — `#new-project` (recomendado: cópia seletiva)
+
+Abra **este repositório** no VS Code e, no Copilot Chat (modo *agent*):
+
+```
+#file:.github/prompts/new-project.prompt.md
+
+Criar projeto "minha-api" em /Users/joao/Projetos — FastAPI + PostgreSQL, API de ingestão
+```
+
+O prompt faz a entrevista de 6 perguntas **antes** de copiar e então, via [catalog.yaml](catalog.yaml):
+
+- Seleciona só os componentes que casam com o seu stack (um projeto Next.js não recebe instruções/KBs de Spark).
+- Copia as KBs do acervo central que se aplicam; se faltar alguma, propõe criar — a KB nova fica **no template** e é reaproveitada nos próximos projetos.
+- Cria o contexto de domínio do projeto (`domain.instructions.md` + `{projeto}.chatmode.md`), preenche o `copilot-instructions.md` e grava o vínculo em `.github/template-link.yaml`.
+
+### Opção B — script de setup (fallback: copia tudo)
+
+```powershell
+# Windows (PowerShell)
+.\setup.ps1 <nome-do-projeto> [diretorio-destino]
+```
+
 ```bash
+# Mac / Linux / Git Bash / WSL
 ./setup.sh <nome-do-projeto> [diretorio-destino]
+```
 
-# Exemplos:
-./setup.sh minha-api
-./setup.sh meu-saas /Users/joao/Projetos
+Depois, dentro do projeto criado, rode `#file:.github/prompts/00-project-init.prompt.md` —
+entrevista de 6 perguntas que preenche o `copilot-instructions.md`, sugere KBs e cria as instruções de domínio.
+
+### Em ambos os casos, na sequência
+
+```
+#file:.github/prompts/sync-context.prompt.md     # gera a Arquitetura após adicionar código
+#file:.github/prompts/01-brainstorm.prompt.md    # explore a primeira feature
 ```
 
 ---
 
-## Primeiros passos após criar o projeto
+## Workflow SDD — AgentSpec 4.2
 
-```bash
-# 1. Abra no VS Code
-code /caminho/do/projeto
-
-# 2. No Copilot Chat, execute o prompt de inicialização
+```text
+#01-brainstorm → #02-define → #03-design → #04-build → #05-ship      (#iterate: cross-phase)
 ```
 
-No chat do Copilot:
+| Fase | Prompt | Gera | Gate |
+|------|--------|------|------|
+| 0 (opcional) | `#01-brainstorm` | `BRAINSTORM_*.md` | abordagem confirmada + YAGNI |
+| 1 | `#02-define` | `DEFINE_*.md` | Clarity Score ≥ 12/15 + MoSCoW |
+| 2 | `#03-design` | `DESIGN_*.md` | manifesto + ADRs + testes |
+| 3 | `#04-build` | código + `BUILD_REPORT_*.md` | verificação + aceite |
+| 4 | `#05-ship` | `archive/{F}/SHIPPED_*.md` | checklist pré-ship |
+
+Use o chat mode **`spec-driven`** para ser guiado fase a fase. Artefatos em `docs/sdd/`.
+Contratos e quality gates: [WORKFLOW_CONTRACTS.yaml](docs/sdd/architecture/WORKFLOW_CONTRACTS.yaml).
+
+### Como rodar um prompt
+
+No Copilot Chat, referencie o arquivo com `#file:` (e adicione sua entrada):
+
 ```
-#file:.github/prompts/00-project-init.prompt.md
+#file:.github/prompts/02-define.prompt.md
+
+Quero construir um sistema de notificações por e-mail
 ```
 
-O prompt vai fazer 6 perguntas e gerar:
-- `copilot-instructions.md` preenchido com contexto real
-- KBs em `.github/context/` para o stack declarado
-- `domain.instructions.md` com entidades e regras de negócio
+Ou **Ctrl+Shift+P → "Chat: Run Prompt"** e selecione o arquivo.
 
 ---
 
-## Workflow SDD
+## Dev Loop (Nível 2)
+
+Para features isoladas, utilitários e KBs — sem o overhead do SDD completo:
 
 ```
-#00-project-init → #01-brainstorm → #02-define → #03-design → #04-build → #05-ship
+#file:.github/prompts/dev.prompt.md   "Quero construir X"      # crafta um PROMPT
+#file:.github/prompts/dev.prompt.md   docs/dev/tasks/PROMPT_X.md  # executa
 ```
 
-### Como usar cada prompt
+Detalhes em [docs/dev/_index.md](docs/dev/_index.md).
 
-No Copilot Chat, referencie o prompt desejado:
+---
 
-```
-#file:.github/prompts/01-brainstorm.prompt.md
+## Devolver conhecimento ao template — `#contribute`
 
-Quero construir um sistema de notificações por email
-```
-
-Ou use o comando **Run Prompt** no VS Code:
-`Ctrl+Shift+P` → "GitHub Copilot: Run Prompt" → selecione o arquivo
-
-| Fase | Como usar | Gera |
-|------|-----------|------|
-| **Init** | `#file:.github/prompts/00-project-init.prompt.md` | copilot-instructions.md, KBs, domain agent |
-| **Brainstorm** | `#file:.github/prompts/01-brainstorm.prompt.md` + ideia | `docs/sdd/features/BRAINSTORM_*.md` |
-| **Define** | `#file:.github/prompts/02-define.prompt.md` + `#file:BRAINSTORM_*.md` | `docs/sdd/features/DEFINE_*.md` |
-| **Design** | `#file:.github/prompts/03-design.prompt.md` + `#file:DEFINE_*.md` | `docs/sdd/features/DESIGN_*.md` |
-| **Build** | `#file:.github/prompts/04-build.prompt.md` + `#file:DESIGN_*.md` | Código + `BUILD_REPORT_*.md` |
-| **Ship** | `#file:.github/prompts/05-ship.prompt.md` + `#file:BUILD_REPORT_*.md` | `docs/sdd/archive/` |
+Dentro de um projeto filho, `#file:.github/prompts/contribute.prompt.md` analisa o que foi
+criado e devolve ao acervo do template **apenas o reaproveitável** (KBs de tecnologia, instruções
+de papel técnico) — contexto de negócio nunca volta. Assim a biblioteca central cresce a cada projeto.
 
 ---
 
@@ -109,36 +141,31 @@ Ou use o comando **Run Prompt** no VS Code:
 KBs ficam em `.github/context/`. Para usar no chat:
 
 ```
-#file:.github/context/fastapi/quick-reference.md
+#file:.github/context/delta-lake/quick-reference.md
 
-Como faço paginação em FastAPI?
+Como faço upsert idempotente em Delta?
 ```
 
-Para criar uma nova KB, peça ao Copilot:
-```
-Gere .github/context/sqlalchemy/quick-reference.md com os padrões mais comuns
-de SQLAlchemy 2.x focados em async e uso com PostgreSQL
-```
+Criar uma nova: `#file:.github/prompts/create-kb.prompt.md` (ou o chat mode `kb-architect`).
 
 ---
 
-## Instruções de contexto
+## MCPs recomendados (documentação em tempo real)
 
-Os arquivos em `.github/instructions/` são aplicados automaticamente pelo Copilot
-com base nos arquivos que você está editando — sem precisar referenciar manualmente.
+- **Context7** — `https://mcp.context7.com/mcp`
+- **Ref Tools** — `https://api.ref.tools/mcp`
 
-Para adicionar instruções de domínio específicas do seu projeto, edite:
-`.github/instructions/domain.instructions.md`
+Configure-os na sua extensão Copilot para grounding de bibliotecas durante Design/Build.
 
 ---
 
 ## Diferenças em relação ao Claude Code
 
-| Funcionalidade | Claude Code | GitHub Copilot |
-|----------------|-------------|----------------|
-| Inicialização do projeto | `/project-init` (automático) | Prompt `#00-project-init` (interativo) |
-| Workflow SDD | Slash commands automáticos | Prompt files manuais |
-| Agentes por domínio | Agentes autônomos | Instruction files por tipo de arquivo |
-| Knowledge Base | Auto-carregada | Referenciada com `#file:` |
-| Memória entre sessões | Sistema de memória persistente | `copilot-instructions.md` |
-| Orquestração de subagentes | Suportado | Não suportado |
+| Funcionalidade | Claude Code | GitHub Copilot (este template) |
+|----------------|-------------|--------------------------------|
+| Criação de projeto | `/new-project` (cópia seletiva) | `#new-project` prompt (agent mode) |
+| Workflow SDD | slash commands | prompt files (`#file:`) |
+| Agentes por domínio | subagentes autônomos | chat modes + instruction files |
+| Knowledge Base | auto-carregada | referenciada com `#file:` |
+| Memória entre sessões | sistema de memória | `copilot-instructions.md` |
+| Orquestração de subagentes | suportada | não suportada (chat mode orquestra) |

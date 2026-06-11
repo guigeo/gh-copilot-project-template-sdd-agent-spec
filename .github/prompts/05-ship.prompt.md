@@ -1,85 +1,54 @@
+---
+description: "Fase 4 do SDD — verificar pré-ship, arquivar artefatos em archive/{FEATURE}/, capturar lições e registrar a feature em copilot-instructions.md"
+mode: agent
+---
+
 # Prompt: Ship — Fase 4 do SDD
 
-Vou arquivar esta feature e capturar lições aprendidas.
+Você é o agente de **Ship**. Feche a feature: verifique, arquive os artefatos e capture lições.
 
-**Contexto do projeto:** #file:../.github/copilot-instructions.md
-
-Referencie o relatório de build:
-`#file:docs/sdd/features/BUILD_REPORT_{FEATURE}.md`
-
----
-
-## Processo
-
-1. Verificar que todos os critérios de aceite foram atendidos
-2. Capturar lições aprendidas
-3. Arquivar todos os artefatos em `docs/sdd/archive/{feature}/`
-4. Atualizar `copilot-instructions.md` com o registro da feature
+**Contexto do projeto:** #file:.github/copilot-instructions.md
+**Template de saída:** #file:docs/sdd/templates/SHIPPED_TEMPLATE.md
+**Build report de entrada:** `#file:docs/sdd/features/BUILD_REPORT_{FEATURE}.md`
 
 ---
 
-## Checklist pré-ship
+## Checklist pré-ship (bloqueante)
 
-```
-PRÉ-SHIP
-━━━━━━━━
+```text
+[ ] BUILD_REPORT mostra 100% de conclusão
 [ ] Todos os critérios de aceite do DEFINE atendidos
 [ ] Testes passando
-[ ] Sem TODO/FIXME críticos no código
-[ ] Documentação atualizada se necessário
-[ ] PR/MR pronto para revisão
+[ ] Sem issues bloqueantes / sem TODO crítico no código
 ```
 
-Se algum item não estiver marcado, NÃO arquivar — resolver primeiro.
-
----
+Se algum item não estiver marcado, **não arquive** — resolva primeiro.
 
 ## Arquivar artefatos
 
-Mover os seguintes arquivos de `docs/sdd/features/` para `docs/sdd/archive/{FEATURE}/`:
+Mova de `docs/sdd/features/` para `docs/sdd/archive/{FEATURE}/`:
+
 - `BRAINSTORM_{FEATURE}.md` (se existir)
 - `DEFINE_{FEATURE}.md`
 - `DESIGN_{FEATURE}.md`
 - `BUILD_REPORT_{FEATURE}.md`
 
+## Atualizar status (status transitions)
+
+Marque `DEFINE`, `DESIGN` e `BUILD_REPORT` como `✅ Shipped`.
+
 ---
 
 ## Gerar documento de lições aprendidas
 
-Criar `docs/sdd/archive/{FEATURE}/SHIPPED_{DATA}.md`:
-
-```markdown
-# Shipped: {Nome da Feature}
-
-**Data de entrega:** {data}
-**Duração:** {estimativa do início ao fim}
-
-## O que foi construído
-{resumo em 2-3 frases}
-
-## Arquivos entregues
-{lista do manifesto de build}
-
-## O que funcionou bem
-- {lição positiva 1}
-- {lição positiva 2}
-
-## O que pode melhorar
-- {lição de melhoria 1}
-- {lição de melhoria 2}
-
-## Débito técnico registrado
-- {item de débito ou "Nenhum"}
-
-## Impacto no projeto
-{como esta feature muda o projeto — novas dependências, padrões estabelecidos}
-```
-
----
+Crie `docs/sdd/archive/{FEATURE}/SHIPPED_{YYYY-MM-DD}.md` seguindo o
+[template](../../docs/sdd/templates/SHIPPED_TEMPLATE.md). Capture lições nas categorias:
+**processo, técnico, comunicação, ferramentas**. Registre o que funcionou, o que melhorar,
+débito técnico e impacto no projeto.
 
 ## Atualizar copilot-instructions.md
 
-Adicionar a feature na seção de features entregues (se existir) ou criar:
+Adicione a feature na seção de features entregues:
 
 ```markdown
 ## Features Entregues
@@ -88,6 +57,10 @@ Adicionar a feature na seção de features entregues (se existir) ou criar:
 |---------|------|-----------|
 | {nome} | {data} | {descrição em uma linha} |
 ```
+
+> Dica: rode `#file:.github/prompts/memory.prompt.md` para destilar insights duráveis,
+> e `#file:.github/prompts/contribute.prompt.md` se alguma KB/instrução criada aqui
+> for reaproveitável pelo template.
 
 ---
 

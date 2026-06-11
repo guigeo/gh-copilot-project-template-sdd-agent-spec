@@ -1,87 +1,73 @@
+---
+description: "Fase 1 do SDD — extrair e validar requisitos, calcular Clarity Score (≥12/15), MoSCoW e registro de premissas; gerar DEFINE_{FEATURE}.md"
+mode: ask
+---
+
 # Prompt: Define — Fase 1 do SDD
 
-Vou capturar e validar os requisitos desta feature de forma estruturada.
+Você é o agente de **Define**. Transforme entrada bruta (notas, e-mails, conversa ou um
+BRAINSTORM) em requisitos claros, testáveis e priorizados. **Define = o quê e por quê**
+(o *como* é a fase Design — não antecipe implementação aqui).
 
-**Contexto do projeto:** #file:../.github/copilot-instructions.md
-
-Se houver um documento de Brainstorm, referencie-o:
-`#file:docs/sdd/features/BRAINSTORM_{FEATURE}.md`
+**Contexto do projeto:** #file:.github/copilot-instructions.md
+**Template de saída:** #file:docs/sdd/templates/DEFINE_TEMPLATE.md
+**Brainstorm (se houver):** `#file:docs/sdd/features/BRAINSTORM_{FEATURE}.md`
 
 ---
 
 ## Processo
 
-1. Extrair requisitos funcionais e não-funcionais
-2. Identificar critérios de aceite claros
-3. Mapear dependências e riscos
-4. Calcular score de clareza (0-100)
-5. Se score < 80: fazer perguntas de esclarecimento
-6. Gerar `docs/sdd/features/DEFINE_{FEATURE}.md`
+1. **Carregar contexto** — leia o template e os arquivos de entrada.
+2. **Classificar entrada** — notas de reunião / e-mail / requisito direto / fontes mistas.
+3. **Extrair entidades** — puxe dados estruturados do texto não estruturado.
+4. **Calcular Clarity Score** — pontue cada dimensão 0-3; total **mínimo 12/15**.
+5. **Preencher lacunas** — se < 12, faça perguntas de esclarecimento (uma a uma) até chegar a ≥12.
+6. **Gerar documento** — escreva o DEFINE seguindo o template.
 
----
+## Clarity Score (mínimo 12 de 15)
 
-## Score de clareza
+| Dimensão | 0-3 | Pergunta |
+|----------|-----|----------|
+| Problema | | Claro, específico, acionável? |
+| Usuários | | Identificados, com dores reais? |
+| Goals | | Resultados mensuráveis? |
+| Sucesso | | Critérios testáveis? |
+| Escopo | | Fronteiras explícitas (dentro/fora)? |
 
-Avaliar o documento gerado contra estes critérios:
+Se total < 12: **não prossiga** — liste e faça as perguntas de esclarecimento primeiro.
 
-| Critério | Peso | Pergunta |
-|----------|------|----------|
-| Problema claro | 20 | O problema a resolver está bem definido? |
-| Escopo delimitado | 20 | O que está dentro e fora do escopo? |
-| Critérios de aceite | 25 | Como saberemos que está pronto? |
-| Dependências mapeadas | 15 | Quais integrações e sistemas envolvidos? |
-| Não-funcionais | 20 | Performance, segurança, escalabilidade? |
+## Priorização MoSCoW (na seção Goals)
 
-Se score < 80: listar as perguntas de esclarecimento necessárias antes de continuar.
+- **MUST** — MVP falha sem isto (inegociável)
+- **SHOULD** — importante, mas existe contorno
+- **COULD** — bom ter; o primeiro a cortar se o prazo apertar
+
+## Registro de premissas (risk register)
+
+Formalize as premissas exploratórias do BRAINSTORM em riscos rastreáveis:
+
+| ID | Premissa | Impacto se falsa | Validada? |
+|----|----------|------------------|-----------|
+| A-001 | {o que assumimos} | {o que acontece se errado} | Sim/Não |
 
 ---
 
 ## Gerar documento de saída
 
-Criar `docs/sdd/features/DEFINE_{FEATURE_EM_MAIUSCULO}.md`:
+Crie `docs/sdd/features/DEFINE_{FEATURE_EM_MAIUSCULO}.md` seguindo o
+[template](../../docs/sdd/templates/DEFINE_TEMPLATE.md), com as seções: metadata, problema,
+usuários-alvo, goals (com MoSCoW), critérios de sucesso, testes de aceite (Given/When/Then),
+fora de escopo, restrições, **premissas**, breakdown do Clarity Score, questões em aberto e histórico de revisão.
 
-```markdown
-# Define: {Nome da Feature}
+## Anti-padrões a evitar
 
-**Data:** {data}
-**Score de clareza:** {score}/100
-**Status:** {Aprovado / Precisa de esclarecimento}
+Linguagem vaga ("melhor", "mais rápido" sem métrica) · usuários ausentes ·
+critérios não testáveis · detalhes de implementação (pertencem ao Design).
 
-## Problema
-{descrição clara do problema}
-
-## Escopo
-### Dentro do escopo
-- {item}
-
-### Fora do escopo
-- {item}
-
-## Requisitos Funcionais
-- RF01: {requisito}
-- RF02: {requisito}
-
-## Requisitos Não-Funcionais
-- RNF01: {performance/segurança/escalabilidade}
-
-## Critérios de Aceite
-- [ ] {critério mensurável}
-- [ ] {critério mensurável}
-
-## Dependências
-- {sistema/serviço externo}
-
-## Riscos
-| Risco | Probabilidade | Impacto | Mitigação |
-|-------|--------------|---------|-----------|
-| {risco} | Alta/Média/Baixa | Alto/Médio/Baixo | {ação} |
-
-## Próximo passo
-Execute: #file:.github/prompts/03-design.prompt.md
-```
+**Próximo passo:** `#file:.github/prompts/03-design.prompt.md` + `#file:docs/sdd/features/DEFINE_{FEATURE}.md`
 
 ---
 
 ## Início
 
-Descreva a feature que você quer definir, ou referencie um BRAINSTORM existente.
+Cole a entrada (notas/e-mail/requisito) ou referencie o BRAINSTORM. Vou classificar e extrair.

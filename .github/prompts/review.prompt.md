@@ -1,8 +1,14 @@
+---
+description: "Revisão de código por correção, segurança, qualidade e performance, com severidades e veredito de merge"
+mode: ask
+---
+
 # Prompt: Revisão de Código
 
-Faça uma revisão completa do código referenciado.
+Faça uma revisão completa do código referenciado. Para uma persona de revisão persistente,
+use o chat mode `code-reviewer` (#file:.github/chatmodes/code-reviewer.chatmode.md).
 
-**Contexto do projeto:** #file:../.github/copilot-instructions.md
+**Contexto do projeto:** #file:.github/copilot-instructions.md
 
 Referencie o(s) arquivo(s) a revisar:
 `#file:src/{caminho}/{arquivo}`

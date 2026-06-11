@@ -1,0 +1,122 @@
+# Catálogo de Componentes — Fonte única de verdade do template (GitHub Copilot)
+# Consumido por new-project.prompt.md para decidir o que copiar para cada projeto filho.
+#
+# Regras de seleção:
+#   - scope: core          → copiado para TODO projeto, sem exceção
+#   - scope: optional      → copiado quando houver interseção entre os metadados do componente
+#                            (stacks / domains / clouds) e as respostas da entrevista
+#   - scope: template-only → nunca copiado (vive só no template, ex.: new-project)
+#   - scope: project       → nunca vive no template; criado dentro do filho
+#                            (ex.: domain.instructions.md, {projeto}.chatmode.md)
+#
+# Taxonomia (alinhar com a entrevista de new-project / 00-project-init):
+#   domains: api-web | data-pipeline | ai-llm | cli | frontend-fullstack | infra-devops
+#   clouds:  aws | gcp | azure | databricks | local
+#   stacks:  tecnologias em kebab-case (python, spark, fastapi, terraform...)
+#
+# Componentes do Copilot:
+#   prompts      → .github/prompts/*.prompt.md        (workflow + utilitários)
+#   instructions → .github/instructions/*.instructions.md  (padrões por tipo de arquivo, applyTo)
+#   chatmodes    → .github/chatmodes/*.chatmode.md     (personas persistentes)
+#   context      → .github/context/{dominio}/          (Knowledge Base, referenciada com #file:)
+
+version: "1.0"
+updated: "2026-06-11"
+
+# =============================================================================
+# PROMPTS — workflow SDD + utilitários (todos core, exceto new-project)
+# =============================================================================
+
+prompts:
+  - { name: 00-project-init, path: .github/prompts/00-project-init.prompt.md, scope: core }
+  - { name: 01-brainstorm,   path: .github/prompts/01-brainstorm.prompt.md,   scope: core }
+  - { name: 02-define,       path: .github/prompts/02-define.prompt.md,       scope: core }
+  - { name: 03-design,       path: .github/prompts/03-design.prompt.md,       scope: core }
+  - { name: 04-build,        path: .github/prompts/04-build.prompt.md,        scope: core }
+  - { name: 05-ship,         path: .github/prompts/05-ship.prompt.md,         scope: core }
+  - { name: iterate,         path: .github/prompts/iterate.prompt.md,         scope: core }
+  - { name: sync-context,    path: .github/prompts/sync-context.prompt.md,    scope: core }
+  - { name: create-kb,       path: .github/prompts/create-kb.prompt.md,       scope: core }
+  - { name: memory,          path: .github/prompts/memory.prompt.md,          scope: core }
+  - { name: readme-maker,    path: .github/prompts/readme-maker.prompt.md,    scope: core }
+  - { name: create-pr,       path: .github/prompts/create-pr.prompt.md,       scope: core }
+  - { name: review,          path: .github/prompts/review.prompt.md,          scope: core }
+  - { name: dev,             path: .github/prompts/dev.prompt.md,             scope: core }
+  # contribute roda no filho (write-back) — precisa existir lá
+  - { name: contribute,      path: .github/prompts/contribute.prompt.md,      scope: core }
+  # new-project é exclusivo do template — nunca copiado para filhos
+  - { name: new-project,     path: .github/prompts/new-project.prompt.md,     scope: template-only }
+
+# =============================================================================
+# CHAT MODES — personas persistentes
+# =============================================================================
+
+chatmodes:
+  - { name: spec-driven,   path: .github/chatmodes/spec-driven.chatmode.md,   scope: core }
+  - { name: code-reviewer, path: .github/chatmodes/code-reviewer.chatmode.md, scope: core }
+  - { name: kb-architect,  path: .github/chatmodes/kb-architect.chatmode.md,  scope: core }
+  # domínio criado no filho por new-project / 00-project-init:
+  # - { name: "{projeto}",  path: .github/chatmodes/{projeto}.chatmode.md,     scope: project }
+
+# =============================================================================
+# INSTRUCTIONS — padrões por tipo de arquivo (applyTo)
+# =============================================================================
+
+instructions:
+  - name: python
+    path: .github/instructions/python.instructions.md
+    scope: optional
+    stacks: [python]
+  - name: tests
+    path: .github/instructions/tests.instructions.md
+    scope: optional
+    stacks: [python, pytest, spark]
+  - name: sql
+    path: .github/instructions/sql.instructions.md
+    scope: optional
+    stacks: [sql, databricks, postgres, spark]
+  # domain.instructions.md é criado no filho (regras de negócio) — nunca no template:
+  - name: domain
+    path: .github/instructions/domain.instructions.md
+    scope: project
+
+# =============================================================================
+# CONTEXT (KBs) — acervo reaproveitável; cresce a cada new-project / create-kb
+# Registrar também em .github/context/_index.yaml
+# =============================================================================
+
+context:
+  - name: pyspark
+    path: .github/context/pyspark/
+    stacks: [python, pyspark, spark]
+    domains: [data-pipeline]
+    last_validated: "2026-06-10"
+    library_version: "Spark 3.5+/4.0"
+  - name: delta-lake
+    path: .github/context/delta-lake/
+    stacks: [delta-lake, databricks, spark]
+    domains: [data-pipeline]
+    last_validated: "2026-06-10"
+    library_version: "Delta 3.x"
+  - name: databricks-lakeflow
+    path: .github/context/databricks-lakeflow/
+    stacks: [databricks, dlt, spark]
+    domains: [data-pipeline]
+    clouds: [databricks]
+    last_validated: "2026-06-10"
+    library_version: "Lakeflow SDP (ex-DLT), docs 2026-06"
+  - name: arquitetura-medalhao
+    path: .github/context/arquitetura-medalhao/
+    stacks: [databricks, spark, delta-lake]
+    domains: [data-pipeline]
+    last_validated: "2026-06-10"
+  - name: qualidade-de-dados
+    path: .github/context/qualidade-de-dados/
+    stacks: [spark, databricks]
+    domains: [data-pipeline]
+    last_validated: "2026-06-10"
+  - name: data-mesh
+    path: .github/context/data-mesh/
+    stacks: [databricks]
+    domains: [data-pipeline]
+    last_validated: "2026-06-10"

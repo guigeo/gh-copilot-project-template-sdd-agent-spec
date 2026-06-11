@@ -39,9 +39,20 @@ def process_item(item: ItemType, config: Config) -> Result:
 - Fixtures em `conftest.py` — não duplicar entre arquivos de teste
 - Cobrir: caminho feliz + principais casos de erro + casos de borda
 
+## Ambiente e dependências — convenção uv
+
+- Usar **uv** para ambiente e dependências (sem instalação global de pacotes via `pip install`).
+- Dependências declaradas no `pyproject.toml`; lockfile `uv.lock` versionado.
+- Comandos:
+  - Adicionar dep: `uv add {pacote}` (dev: `uv add --dev {pacote}`)
+  - Rodar comando no ambiente: `uv run {cmd}` (ex.: `uv run pytest`, `uv run ruff check .`)
+  - Sincronizar ambiente: `uv sync`
+- Não criar/ativar venv manualmente nem usar `pip install` global — o `uv run`/`uv sync` cuidam do `.venv` do projeto.
+
 ## Anti-patterns — nunca fazer
 
 - Variáveis globais mutáveis
 - Lógica de negócio em `__init__.py`
 - `print()` em código de produção — usar `logging`
 - Strings hardcoded que são configuração — usar constantes ou config
+- `pip install` global ou venv manual — usar **uv** (`uv add` / `uv run` / `uv sync`)

@@ -35,6 +35,29 @@ Antes de qualquer feature, use os prompts em `.github/prompts/` para guiar o pro
 | `#03-design` | 2 | `docs/sdd/features/DESIGN_*.md` |
 | `#04-build` | 3 | Código + `docs/sdd/features/BUILD_REPORT_*.md` |
 | `#05-ship` | 4 | `docs/sdd/archive/{feature}/SHIPPED_*.md` |
+| `#iterate` | cross-phase | Atualiza um documento + cascade rio abaixo |
+
+### Prompts utilitários e de ciclo de vida
+
+| Prompt | Propósito |
+|--------|-----------|
+| `#new-project` | **No template** — entrevista + cópia seletiva via `catalog.yaml` |
+| `#contribute` | **No filho** — devolve KB/instrução reaproveitável ao acervo do template |
+| `#sync-context` | Atualiza este arquivo a partir do código |
+| `#create-kb` | Cria um domínio de KB em `.github/context/` |
+| `#memory` | Destila insights duráveis da sessão para cá |
+| `#readme-maker` | Gera o README do projeto |
+| `#create-pr` | Prepara e abre um Pull Request |
+| `#review` | Revisão de código com severidades |
+| `#dev` | Dev Loop (Nível 2) para features isoladas / KBs |
+
+### Chat modes (personas — selecione no seletor de modo do chat)
+
+| Modo | Quando usar |
+|------|-------------|
+| `spec-driven` | Orquestrar a feature pelas 5 fases do SDD |
+| `code-reviewer` | Revisão rigorosa de um diff/arquivo |
+| `kb-architect` | Criar/curar KBs em `.github/context/` |
 
 ### Como usar os prompts
 
@@ -63,13 +86,19 @@ Arquivos de referência ficam em `.github/context/`. Referencie explicitamente n
 ├── src/           # Código-fonte
 ├── tests/         # Testes
 ├── docs/
-│   └── sdd/       # Artefatos SDD (BRAINSTORM, DEFINE, DESIGN, BUILD, SHIP)
+│   ├── sdd/       # Artefatos SDD
+│   │   ├── features/       # BRAINSTORM/DEFINE/DESIGN ativos
+│   │   ├── archive/        # Features entregues (SHIPPED)
+│   │   ├── templates/      # Templates de documento (5)
+│   │   └── architecture/   # WORKFLOW_CONTRACTS.yaml + ARCHITECTURE.md
+│   └── dev/       # Dev Loop (PROMPT/PROGRESS templates)
 ├── .github/
 │   ├── copilot-instructions.md   # Este arquivo — contexto global
-│   ├── prompts/                  # Prompts do workflow SDD
-│   ├── instructions/             # Instruções por contexto (linguagem, domínio)
-│   └── context/                  # Knowledge Base do projeto
-└── ...
+│   ├── prompts/                  # Prompts do workflow SDD + utilitários
+│   ├── chatmodes/                # Personas (spec-driven, code-reviewer, kb-architect)
+│   ├── instructions/             # Padrões por tipo de arquivo (applyTo)
+│   └── context/                  # Knowledge Base (referenciada com #file:)
+└── catalog.yaml   # (só no template) catálogo de componentes p/ #new-project
 ```
 
 ---
@@ -121,7 +150,16 @@ com base no tipo de arquivo que você está editando:
 
 ## Referências
 
-- **Prompts SDD:** `.github/prompts/`
-- **Instruções de contexto:** `.github/instructions/`
-- **Knowledge Base:** `.github/context/`
-- **Artefatos SDD:** `docs/sdd/`
+- **Prompts (workflow + utilitários):** `.github/prompts/`
+- **Chat modes (personas):** `.github/chatmodes/`
+- **Instruções por tipo de arquivo:** `.github/instructions/`
+- **Knowledge Base:** `.github/context/` (índice em `_index.yaml`)
+- **Artefatos SDD:** `docs/sdd/` — contratos em `docs/sdd/architecture/WORKFLOW_CONTRACTS.yaml`
+- **Dev Loop:** `docs/dev/_index.md`
+- **Catálogo de componentes (template):** `catalog.yaml`
+
+### KBs disponíveis no acervo
+
+`pyspark` · `delta-lake` · `databricks-lakeflow` · `arquitetura-medalhao` ·
+`qualidade-de-dados` · `data-mesh` — referencie com
+`#file:.github/context/{kb}/quick-reference.md`. Crie novas com `#create-kb`.

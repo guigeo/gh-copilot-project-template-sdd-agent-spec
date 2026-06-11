@@ -1,4 +1,12 @@
+---
+description: "Roda NO PROJETO FILHO (criado via setup.sh) — entrevista de 6 perguntas que preenche copilot-instructions.md, sugere KBs em .github/context/ e cria domain.instructions.md"
+mode: agent
+---
+
 # Prompt: Inicialização do Projeto
+
+> Use isto quando o projeto foi criado via `setup.sh` (cópia total). Para criar projetos novos
+> a partir do template com **cópia seletiva**, use `#file:.github/prompts/new-project.prompt.md`.
 
 Vou te fazer 6 perguntas para configurar este projeto. Responda uma a uma.
 Ao final, vou gerar o conteúdo de `.github/copilot-instructions.md`, criar a estrutura de
