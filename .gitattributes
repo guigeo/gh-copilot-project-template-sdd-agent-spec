@@ -1,0 +1,12 @@
+# Normaliza fim de linha entre Windows e Mac/Linux
+* text=auto
+
+# Scripts dependem do fim de linha correto para o interpretador
+*.sh  text eol=lf
+*.ps1 text eol=crlf
+
+# Markdown e configs como texto (diff legível)
+*.md   text
+*.yaml text
+*.yml  text
+*.json text
