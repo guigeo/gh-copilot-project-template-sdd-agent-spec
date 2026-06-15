@@ -41,7 +41,9 @@ Antes de qualquer feature, use os prompts em `.github/prompts/` para guiar o pro
 
 | Prompt | Propósito |
 |--------|-----------|
-| `#new-project` | **No template** — entrevista + cópia seletiva via `catalog.yaml` |
+| `#new-project` | **No template** — greenfield: entrevista + cópia seletiva via `catalog.yaml` |
+| `#adopt` | **No template** — brownfield: adota projeto existente (detecta stack, cópia aditiva, read-only no acervo) |
+| `#distill` | **No filho** — destila feature shipada em KB generalizada (técnica, sem negócio) |
 | `#contribute` | **No filho** — devolve KB/instrução reaproveitável ao acervo do template |
 | `#sync-context` | Atualiza este arquivo a partir do código |
 | `#create-kb` | Cria um domínio de KB em `.github/context/` |
@@ -49,6 +51,7 @@ Antes de qualquer feature, use os prompts em `.github/prompts/` para guiar o pro
 | `#readme-maker` | Gera o README do projeto |
 | `#create-pr` | Prepara e abre um Pull Request |
 | `#review` | Revisão de código com severidades |
+| `#telemetry` | Insights de uso do AgentSpec (relatórios locais) |
 | `#dev` | Dev Loop (Nível 2) para features isoladas / KBs |
 
 ### Chat modes (personas — selecione no seletor de modo do chat)
@@ -161,5 +164,5 @@ com base no tipo de arquivo que você está editando:
 ### KBs disponíveis no acervo
 
 `pyspark` · `delta-lake` · `databricks-lakeflow` · `arquitetura-medalhao` ·
-`qualidade-de-dados` · `data-mesh` — referencie com
+`qualidade-de-dados` · `data-mesh` · `geoespacial-databricks` — referencie com
 `#file:.github/context/{kb}/quick-reference.md`. Crie novas com `#create-kb`.

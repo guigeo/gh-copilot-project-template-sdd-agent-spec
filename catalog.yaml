@@ -3,9 +3,12 @@
 #
 # Regras de seleção:
 #   - scope: core          → copiado para TODO projeto, sem exceção
-#   - scope: optional      → copiado quando houver interseção entre os metadados do componente
-#                            (stacks / domains / clouds) e as respostas da entrevista
-#   - scope: template-only → nunca copiado (vive só no template, ex.: new-project)
+#   - scope: optional      → copiado SÓ se TODAS as dimensões que o componente DECLARA casarem
+#                            (AND entre dimensões, não OR achatado): para cada dimensão presente
+#                            (stacks / domains / clouds) tem que haver interseção com a entrevista;
+#                            dimensão ausente = curinga. Ex.: clouds:[aws]+stacks:[python] NÃO entra
+#                            em cloud=local só porque "python" casou.
+#   - scope: template-only → nunca copiado (vive só no template, ex.: new-project, adopt)
 #   - scope: project       → nunca vive no template; criado dentro do filho
 #                            (ex.: domain.instructions.md, {projeto}.chatmode.md)
 #
@@ -14,6 +17,13 @@
 #   clouds:  aws | gcp | azure | databricks | local
 #   stacks:  tecnologias em kebab-case (python, spark, fastapi, terraform...)
 #
+# CONVENÇÃO de `stacks` (evita falso-positivo): liste em `stacks` SÓ tokens que devem
+# disparar match sozinhos. NÃO misture uma linguagem genérica (python) com um framework
+# específico (aws-lambda, pyspark) na mesma lista — o OR-dentro-da-dimensão casaria pelo
+# token genérico e puxaria o componente p/ qualquer projeto naquela linguagem. Se o
+# discriminador é o framework, liste só o framework. `python` em stacks só quando o
+# componente serve a QUALQUER projeto Python.
+#
 # Componentes do Copilot:
 #   prompts      → .github/prompts/*.prompt.md        (workflow + utilitários)
 #   instructions → .github/instructions/*.instructions.md  (padrões por tipo de arquivo, applyTo)
@@ -21,7 +31,7 @@
 #   context      → .github/context/{dominio}/          (Knowledge Base, referenciada com #file:)
 
 version: "1.0"
-updated: "2026-06-11"
+updated: "2026-06-14"
 
 # =============================================================================
 # PROMPTS — workflow SDD + utilitários (todos core, exceto new-project)
@@ -42,10 +52,13 @@ prompts:
   - { name: create-pr,       path: .github/prompts/create-pr.prompt.md,       scope: core }
   - { name: review,          path: .github/prompts/review.prompt.md,          scope: core }
   - { name: dev,             path: .github/prompts/dev.prompt.md,             scope: core }
-  # contribute roda no filho (write-back) — precisa existir lá
+  - { name: telemetry,       path: .github/prompts/telemetry.prompt.md,       scope: core }
+  # contribute e distill rodam no filho (pipeline de conhecimento) — precisam existir lá
   - { name: contribute,      path: .github/prompts/contribute.prompt.md,      scope: core }
-  # new-project é exclusivo do template — nunca copiado para filhos
+  - { name: distill,         path: .github/prompts/distill.prompt.md,         scope: core }
+  # new-project e adopt são exclusivos do template — nunca copiados para filhos
   - { name: new-project,     path: .github/prompts/new-project.prompt.md,     scope: template-only }
+  - { name: adopt,           path: .github/prompts/adopt.prompt.md,           scope: template-only }
 
 # =============================================================================
 # CHAT MODES — personas persistentes
@@ -120,3 +133,10 @@ context:
     stacks: [databricks]
     domains: [data-pipeline]
     last_validated: "2026-06-10"
+  - name: geoespacial-databricks
+    path: .github/context/geoespacial-databricks/
+    stacks: [databricks, spark, h3]
+    domains: [data-pipeline]
+    clouds: [databricks]
+    last_validated: "2026-06-13"
+    library_version: "Databricks SQL (H3 + ST_*), docs 2026"

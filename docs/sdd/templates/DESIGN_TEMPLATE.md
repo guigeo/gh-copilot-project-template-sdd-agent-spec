@@ -94,7 +94,7 @@
 
 | Contexto a carregar | Arquivos | Por quê |
 |---------------------|----------|---------|
-| `#file:.github/context/{kb-1}/quick-reference.md` | 1, 3 | {ex.: padrões Cloud Run} |
+| `#file:.github/context/{kb-1}/quick-reference.md` | 1, 3 | {ex.: padrões de ingestão Auto Loader} |
 | chatmode: `{modo}` | 2 | {ex.: persona de revisão/arquitetura} |
 | instructions: `{tipo}.instructions.md` (auto) | 4 | {ex.: padrões de teste pytest} |
 | (nenhum) | {se houver} | {Build trata diretamente} |

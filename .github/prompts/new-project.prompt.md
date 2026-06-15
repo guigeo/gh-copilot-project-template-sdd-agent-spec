@@ -10,6 +10,9 @@ mode: agent
 >
 > Conhecimento reaproveitável (KBs de tecnologia, instruções de papel técnico) nasce e fica
 > **no template**. Conhecimento específico (regras de negócio, domínio do projeto) nasce **no filho**.
+>
+> **Greenfield (pasta nova e vazia).** Para adotar um projeto que **já existe** (brownfield),
+> use o irmão `#file:.github/prompts/adopt.prompt.md`.
 
 **Catálogo (fonte da verdade):** #file:catalog.yaml
 
@@ -40,9 +43,12 @@ Para cada entrada do `catalog.yaml`:
 
 ```text
 scope: core          → SEMPRE copiar
-scope: template-only → NUNCA copiar (ex.: este prompt new-project)
-scope: optional      → copiar se houver interseção entre os metadados do componente
-                       (stacks / domains / clouds) e as respostas normalizadas P2–P4
+scope: template-only → NUNCA copiar (ex.: este prompt new-project, adopt)
+scope: optional      → copiar SÓ se TODAS as dimensões que o componente DECLARA casarem
+                       (AND entre dimensões, não OR achatado): para cada dimensão presente
+                       (stacks / domains / clouds) tem que haver interseção com as respostas
+                       P2–P4; dimensão ausente = curinga. Ex.: clouds:[aws]+stacks:[python]
+                       NÃO entra em cloud=local só porque "python" casou.
 ```
 
 **KBs (`.github/context/`):** comparar o stack com a seção `context:` do catálogo:
